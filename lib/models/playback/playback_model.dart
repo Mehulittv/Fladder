@@ -159,25 +159,12 @@ class PlaybackModelHelper {
       return EpisodeModel.fromBaseDto(episode, ref);
     }
   }
-  Future<String?> getDirectDownloadUrl(String itemId, String apiKey) async {
-  final url = "https://jellyfin.vflix.xyz/Items/$itemId/Download?api_key=$apiKey";
-  
-  final response = await http.head(Uri.parse(url), headers: {
-    'User-Agent': 'Mozilla/5.0',
-  });
+ 
 
-  if (response.isRedirect || response.headers.containsKey('location')) {
-    return response.headers['location'];
-  } else {
-    return null;
-  }
-  }
-  
-
-  Future<PlaybackModel?> createServerPlaybackModel(ItemBaseModel? item, PlaybackType? type,
-      {PlaybackModel? oldModel, List<ItemBaseModel>? libraryQueue, Duration? startPosition}) async {
-      try {
-    if (item == null) return null;
+ Future<PlaybackModel?> createServerPlaybackModel(ItemBaseModel? item, PlaybackType? type,
+    {PlaybackModel? oldModel, List<ItemBaseModel>? libraryQueue, Duration? startPosition}) async {
+  if (item == null) return null;
+  try {
     final userId = ref.read(userProvider)?.id;
     if (userId?.isEmpty == true) return null;
 
@@ -188,7 +175,10 @@ class PlaybackModelHelper {
     };
 
     final fullItem = await api.usersUserIdItemsItemIdGet(itemId: firstItemToPlay.id);
-    final mediaSource = fullItem.body?.mediaSources?.first;
+    final playbackInfo = fullItem.body;
+    if (playbackInfo == null) return null;
+
+    final mediaSource = playbackInfo.mediaSources?.firstOrNull;
     if (mediaSource == null) return null;
 
     final mediaSegments = await api.mediaSegmentsGet(id: item.id);
@@ -206,26 +196,14 @@ class PlaybackModelHelper {
       playbackInfo: playbackInfo,
       trickPlay: trickPlay,
       media: Media(url: directDownloadUrl.isNotEmpty ? directDownloadUrl : "${ref.read(userProvider)?.server ?? ""}/Videos/${mediaSource.id}/stream"),
-      mediaStreams: mediaStreamsWithUrls,
+      mediaStreams: MediaStreamsModel.fromMediaStreamsList(mediaSource, mediaSource.mediaStreams ?? [], ref),
     );
-  } else if ((mediaSource.supportsTranscoding ?? false) && mediaSource.transcodingUrl != null) {
-        return TranscodePlaybackModel(
-          item: fullItem.body ?? item,
-          queue: queue,
-          mediaSegments: mediaSegments?.body,
-          chapters: chapters,
-          trickPlay: trickPlay,
-          playbackInfo: playbackInfo,
-          media: Media(url: "${ref.read(userProvider)?.server ?? ""}${mediaSource.transcodingUrl ?? ""}"),
-          mediaStreams: mediaStreamsWithUrls,
-        );
-      }
-      return null;
-    } catch (e) {
-      log(e.toString());
-      return null;
-    }
+  } catch (e) {
+    log(e.toString());
+    return null;
   }
+}
+  
 
   String? isValidVideoUrl(String path) {
     Uri? uri = Uri.tryParse(path);
