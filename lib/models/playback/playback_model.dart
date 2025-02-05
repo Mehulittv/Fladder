@@ -176,8 +176,8 @@ class PlaybackModelHelper {
     };
 
     final response = await api.usersUserIdItemsItemIdGet(itemId: firstItemToPlay.id);
-    final fullItem = response.body as PlaybackInfoResponse?;
-    if (fullItem == null) return null;
+    final fullItem = response.body;
+    if (fullItem == null || fullItem is! PlaybackInfoResponse) return null;
 
     final mediaSources = fullItem.mediaSources;
     if (mediaSources == null || mediaSources.isEmpty) return null;
@@ -186,7 +186,7 @@ class PlaybackModelHelper {
 
     final mediaSegments = await api.mediaSegmentsGet(id: item.id);
     final trickPlay = (await api.getTrickPlay(item: fullItem, ref: ref))?.body;
-    final chapters = fullItem.overview?.chapters ?? [];
+    final chapters = fullItem is ItemBaseModel ? fullItem.overview?.chapters ?? [] : [];
 
     final apiKey = ref.read(userProvider)?.credentials.token ?? "";
     final directDownloadUrl = await getDirectDownloadUrl(mediaSource.id ?? "", apiKey);
