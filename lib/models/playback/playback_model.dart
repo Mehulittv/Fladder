@@ -174,26 +174,28 @@ class PlaybackModelHelper {
       _ => item,
     };
 
-    final fullItem = await api.usersUserIdItemsItemIdGet(itemId: firstItemToPlay.id);
-    final playbackInfo = fullItem.body;
-    if (playbackInfo == null) return null;
+    final response = await api.usersUserIdItemsItemIdGet(itemId: firstItemToPlay.id);
+    final fullItem = response.body;
+    if (fullItem == null) return null;
 
-    final mediaSource = playbackInfo.mediaSources?.firstOrNull;
-    if (mediaSource == null) return null;
+    final mediaSources = fullItem.mediaSources;
+    if (mediaSources == null || mediaSources.isEmpty) return null;
+    
+    final mediaSource = mediaSources.first;
 
     final mediaSegments = await api.mediaSegmentsGet(id: item.id);
-    final trickPlay = (await api.getTrickPlay(item: fullItem.body, ref: ref))?.body;
-    final chapters = fullItem.body?.overview.chapters ?? [];
+    final trickPlay = (await api.getTrickPlay(item: fullItem, ref: ref))?.body;
+    final chapters = fullItem.overview?.chapters ?? [];
 
     final apiKey = ref.read(userProvider)?.credentials.token ?? "";
     final directDownloadUrl = await getDirectDownloadUrl(mediaSource.id ?? "", apiKey);
 
     return DirectPlaybackModel(
-      item: fullItem.body ?? item,
+      item: fullItem,
       queue: queue,
       mediaSegments: mediaSegments?.body,
       chapters: chapters,
-      playbackInfo: playbackInfo,
+      playbackInfo: fullItem,
       trickPlay: trickPlay,
       media: Media(url: directDownloadUrl.isNotEmpty ? directDownloadUrl : "${ref.read(userProvider)?.server ?? ""}/Videos/${mediaSource.id}/stream"),
       mediaStreams: MediaStreamsModel.fromMediaStreamsList(mediaSource, mediaSource.mediaStreams ?? [], ref),
