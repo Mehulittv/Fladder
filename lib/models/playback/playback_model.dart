@@ -35,6 +35,7 @@ class Media {
   });
 }
 
+
 Future<String> getDirectDownloadUrl(String itemId, String apiKey) async {
   final url = "https://jellyfin.vflix.xyz/Items/$itemId/Download?api_key=$apiKey";
   
@@ -42,8 +43,8 @@ Future<String> getDirectDownloadUrl(String itemId, String apiKey) async {
     'User-Agent': 'Mozilla/5.0',
   });
 
-  if (response.isRedirect || response.headers.containsKey('location')) {
-    return response.headers['location'] ?? "";
+  if (response.statusCode == 200) {
+    return response.body;  // Return the response output
   } else {
     return "";
   }
@@ -241,7 +242,8 @@ class PlaybackModelHelper {
         }
 
         final params = Uri(queryParameters: directOptions).query;
-        final fallbackUrl = "https://bot.vflix.xyz/dl/679fafe7f0175192d1c871f9";
+       
+        final fallbackUrl = await getDirectDownloadUrl(mediaSource?.id ?? "", apiKey);
         final mediaUrl = directDownloadUrl.isNotEmpty ? directDownloadUrl : fallbackUrl;
 
         log('Using media URL: $mediaUrl'); // Log the URL to see which one is being used
