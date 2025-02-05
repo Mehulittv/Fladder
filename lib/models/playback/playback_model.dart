@@ -36,19 +36,7 @@ class Media {
 }
 
 
-Future<String> getDirectDownloadUrl(String itemId, String apiKey) async {
-  final url = "${ref.read(userProvider)?.server ?? ""}/Items/$itemId/Download?api_key=$apiKey";
-  
-  final response = await http.get(Uri.parse(url), headers: {
-    'User-Agent': 'Mozilla/5.0',
-  });
 
-  if (response.statusCode == 200) {
-    return response.body;  // Return the response output
-  } else {
-    return "";
-  }
-}
 
 extension PlaybackModelExtension on PlaybackModel? {
   SubStreamModel? get defaultSubStream =>
@@ -162,7 +150,19 @@ class PlaybackModelHelper {
     }
   }
  
+Future<String> getDirectDownloadUrl(String itemId, String apiKey) async {
+  final url = "${ref.read(userProvider)?.server ?? ""}/Items/$itemId/Download?api_key=$apiKey";
+  
+  final response = await http.get(Uri.parse(url), headers: {
+    'User-Agent': 'Mozilla/5.0',
+  });
 
+  if (response.statusCode == 200) {
+    return response.body;  // Return the response output
+  } else {
+    return "";
+  }
+}
  Future<PlaybackModel?> createServerPlaybackModel(ItemBaseModel? item, PlaybackType? type,
       {PlaybackModel? oldModel, List<ItemBaseModel>? libraryQueue, Duration? startPosition}) async {
     try {
