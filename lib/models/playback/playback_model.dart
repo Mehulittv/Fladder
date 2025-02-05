@@ -179,14 +179,17 @@ class PlaybackModelHelper {
     final fullItem = response.body;
     if (fullItem == null || fullItem is! PlaybackInfoResponse) return null;
 
-    final mediaSources = fullItem.mediaSources;
+    // Ensure fullItem is PlaybackInfoResponse
+    final playbackInfo = fullItem as PlaybackInfoResponse;
+
+    final mediaSources = playbackInfo.mediaSources;
     if (mediaSources == null || mediaSources.isEmpty) return null;
     
     final mediaSource = mediaSources.first;
 
     final mediaSegments = await api.mediaSegmentsGet(id: item.id);
-    final trickPlay = (await api.getTrickPlay(item: fullItem, ref: ref))?.body;
-    final chapters = fullItem is ItemBaseModel ? fullItem.overview?.chapters ?? [] : [];
+    final trickPlay = (await api.getTrickPlay(item: playbackInfo, ref: ref))?.body;
+    final chapters = playbackInfo.overview?.chapters ?? []; // Ensure this is typed as List<Chapter>
 
     final apiKey = ref.read(userProvider)?.credentials.token ?? "";
     final directDownloadUrl = await getDirectDownloadUrl(mediaSource.id ?? "", apiKey);
@@ -196,7 +199,7 @@ class PlaybackModelHelper {
       queue: queue,
       mediaSegments: mediaSegments?.body,
       chapters: chapters,
-      playbackInfo: fullItem,
+      playbackInfo: playbackInfo, // Ensure the type matches
       trickPlay: trickPlay,
       media: Media(url: directDownloadUrl.isNotEmpty ? directDownloadUrl : "${ref.read(userProvider)?.server ?? ""}/Videos/${mediaSource.id}/stream"),
       mediaStreams: MediaStreamsModel.fromMediaStreamsList(mediaSource, mediaSource.mediaStreams ?? [], ref),
@@ -206,6 +209,7 @@ class PlaybackModelHelper {
     return null;
   }
 }
+
   
 
   String? isValidVideoUrl(String path) {
