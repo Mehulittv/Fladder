@@ -189,7 +189,7 @@ class PlaybackModelHelper {
 
     final mediaSegments = await api.mediaSegmentsGet(id: item.id);
     final trickPlay = (await api.getTrickPlay(item: playbackInfo, ref: ref))?.body;
-    final chapters = playbackInfo.overview?.chapters ?? []; // Ensure this is typed as List<Chapter>
+    final chapters = playbackInfo.chapters ?? []; // Make sure to adjust this to the correct getter
 
     final apiKey = ref.read(userProvider)?.credentials.token ?? "";
     final directDownloadUrl = await getDirectDownloadUrl(mediaSource.id ?? "", apiKey);
@@ -209,6 +209,7 @@ class PlaybackModelHelper {
     return null;
   }
 }
+
 
   
 
