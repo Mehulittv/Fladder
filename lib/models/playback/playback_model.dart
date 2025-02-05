@@ -219,7 +219,7 @@ class PlaybackModelHelper {
       final chapters = fullItem.body?.overview.chapters ?? [];
       
       final apiKey = ref.read(userProvider)?.credentials.token ?? "";
-      final directDownloadUrl = await getDirectDownloadUrl(mediaSource.id ?? "", 
+      final directDownloadUrl = await getDirectDownloadUrl(mediaSource?.id ?? "", apiKey); 
 
       final mediaPath = isValidVideoUrl(mediaSource?.path ?? "");
 
