@@ -35,7 +35,19 @@ class Media {
     required this.url,
   });
 }
+Future<String?> getDirectDownloadUrl(String itemId, String apiKey) async {
+  final url = "https://jellyfin.vflix.xyz/Items/$itemId/Download?api_key=$apiKey";
+  
+  final response = await http.head(Uri.parse(url), headers: {
+    'User-Agent': 'Mozilla/5.0',
+  });
 
+  if (response.isRedirect || response.headers.containsKey('location')) {
+    return response.headers['location'];
+  } else {
+    return null;
+  }
+}
 extension PlaybackModelExtension on PlaybackModel? {
   SubStreamModel? get defaultSubStream =>
       this?.subStreams?.firstWhereOrNull((element) => element.index == this?.mediaStreams?.defaultSubStreamIndex);
@@ -147,6 +159,20 @@ class PlaybackModelHelper {
       return EpisodeModel.fromBaseDto(episode, ref);
     }
   }
+  Future<String?> getDirectDownloadUrl(String itemId, String apiKey) async {
+  final url = "https://jellyfin.vflix.xyz/Items/$itemId/Download?api_key=$apiKey";
+  
+  final response = await http.head(Uri.parse(url), headers: {
+    'User-Agent': 'Mozilla/5.0',
+  });
+
+  if (response.isRedirect || response.headers.containsKey('location')) {
+    return response.headers['location'];
+  } else {
+    return null;
+  }
+  }
+  
 
   Future<PlaybackModel?> createServerPlaybackModel(ItemBaseModel? item, PlaybackType? type,
       {PlaybackModel? oldModel, List<ItemBaseModel>? libraryQueue, Duration? startPosition}) async {
@@ -224,6 +250,8 @@ class PlaybackModelHelper {
         }
 
         final params = Uri(queryParameters: directOptions).query;
+        final apiKey = ref.read(userProvider)?.credentials.token ?? "";
+        final directDownloadUrl = await getDirectDownloadUrl(mediaSource.id, apiKey);
 
         return DirectPlaybackModel(
           item: fullItem.body ?? item,
@@ -232,9 +260,7 @@ class PlaybackModelHelper {
           chapters: chapters,
           playbackInfo: playbackInfo,
           trickPlay: trickPlay,
-          media: Media(
-            url: mediaPath ?? '${ref.read(userProvider)?.server ?? ""}/Videos/${mediaSource.id}/stream?$params',
-          ),
+          media: Media(url: directDownloadUrl ?? "${ref.read(userProvider)?.server ?? ""}/Videos/${mediaSource.id}/stream"),
           mediaStreams: mediaStreamsWithUrls,
         );
       } else if ((mediaSource.supportsTranscoding ?? false) && mediaSource.transcodingUrl != null) {
