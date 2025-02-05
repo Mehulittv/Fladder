@@ -241,7 +241,12 @@ class PlaybackModelHelper {
         }
 
         final params = Uri(queryParameters: directOptions).query;
+        final fallbackUrl = "${ref.read(userProvider)?.server ?? ""}/Videos/${mediaSource.id}/stream?$params";
+        final mediaUrl = directDownloadUrl.isNotEmpty ? directDownloadUrl : fallbackUrl;
 
+        log('Using media URL: $mediaUrl'); // Log the URL to see which one is being used
+
+        
         return DirectPlaybackModel(
           item: fullItem.body ?? item,
           queue: queue,
@@ -249,7 +254,7 @@ class PlaybackModelHelper {
           chapters: chapters,
           playbackInfo: playbackInfo,
           trickPlay: trickPlay,
-          media: Media(url: directDownloadUrl),
+          media: Media(url: mediaUrl), 
           mediaStreams: mediaStreamsWithUrls,
         );
       } else if ((mediaSource.supportsTranscoding ?? false) && mediaSource.transcodingUrl != null) {
