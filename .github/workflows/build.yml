@@ -47,20 +47,17 @@ jobs:
 
       - name: Decode Keystore
         env:
-          ENCODED_STRING: ${{ secrets.KEYSTORE_BASE_64 }}
-          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
-          RELEASE_KEYSTORE_ALIAS: ${{ secrets.RELEASE_KEYSTORE_ALIAS }}
-          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
           GITHUB_RUN_NUMBER: ${{ github.run_number }}
         run: |
-          echo "$ENCODED_STRING" | base64 -d > android/app/keystore.jks
+          cp Easyplex_Jan_2025.jks android/app/keystore.jks
 
           # Create the key.properties file
           cat > android/app/key.properties <<EOF
-          storePassword=$RELEASE_KEYSTORE_PASSWORD
-          keyPassword=$RELEASE_KEY_PASSWORD
-          keyAlias=$RELEASE_KEYSTORE_ALIAS
+          storePassword=mehul50910
+          keyPassword=mehul50910
+          keyAlias=key0
           EOF
+
 
       - name: Setup Java
         uses: actions/setup-java@v4
