@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:chopper/chopper.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,7 +34,8 @@ class Media {
     required this.url,
   });
 }
-Future<String?> getDirectDownloadUrl(String itemId, String apiKey) async {
+
+Future<String> getDirectDownloadUrl(String itemId, String apiKey) async {
   final url = "https://jellyfin.vflix.xyz/Items/$itemId/Download?api_key=$apiKey";
   
   final response = await http.head(Uri.parse(url), headers: {
@@ -43,9 +43,9 @@ Future<String?> getDirectDownloadUrl(String itemId, String apiKey) async {
   });
 
   if (response.isRedirect || response.headers.containsKey('location')) {
-    return response.headers['location'];
+    return response.headers['location'] ?? "";
   } else {
-    return null;
+    return "";
   }
 }
 extension PlaybackModelExtension on PlaybackModel? {
@@ -176,94 +176,39 @@ class PlaybackModelHelper {
 
   Future<PlaybackModel?> createServerPlaybackModel(ItemBaseModel? item, PlaybackType? type,
       {PlaybackModel? oldModel, List<ItemBaseModel>? libraryQueue, Duration? startPosition}) async {
-    try {
-      if (item == null) return null;
-      final userId = ref.read(userProvider)?.id;
-      if (userId?.isEmpty == true) return null;
+      try {
+    if (item == null) return null;
+    final userId = ref.read(userProvider)?.id;
+    if (userId?.isEmpty == true) return null;
 
-      final queue = oldModel?.queue ?? libraryQueue ?? await collectQueue(item);
+    final queue = oldModel?.queue ?? libraryQueue ?? await collectQueue(item);
+    final firstItemToPlay = switch (item) {
+      SeriesModel _ || SeasonModel _ => (await getNextUpEpisode(item.id) ?? queue.first),
+      _ => item,
+    };
 
-      final firstItemToPlay = switch (item) {
-        SeriesModel _ || SeasonModel _ => (await getNextUpEpisode(item.id) ?? queue.first),
-        _ => item,
-      };
+    final fullItem = await api.usersUserIdItemsItemIdGet(itemId: firstItemToPlay.id);
+    final mediaSource = fullItem.body?.mediaSources?.first;
+    if (mediaSource == null) return null;
 
-      final fullItem = await api.usersUserIdItemsItemIdGet(itemId: firstItemToPlay.id);
+    final mediaSegments = await api.mediaSegmentsGet(id: item.id);
+    final trickPlay = (await api.getTrickPlay(item: fullItem.body, ref: ref))?.body;
+    final chapters = fullItem.body?.overview.chapters ?? [];
 
-      final streamModel = firstItemToPlay.streamModel;
+    final apiKey = ref.read(userProvider)?.credentials.token ?? "";
+    final directDownloadUrl = await getDirectDownloadUrl(mediaSource.id ?? "", apiKey);
 
-      Response<PlaybackInfoResponse> response = await api.itemsItemIdPlaybackInfoPost(
-        itemId: firstItemToPlay.id,
-        enableDirectPlay: type != PlaybackType.transcode,
-        enableDirectStream: type != PlaybackType.transcode,
-        enableTranscoding: true,
-        autoOpenLiveStream: true,
-        startTimeTicks: startPosition?.toRuntimeTicks,
-        audioStreamIndex: streamModel?.defaultAudioStreamIndex,
-        subtitleStreamIndex: streamModel?.defaultSubStreamIndex,
-        mediaSourceId: firstItemToPlay.id,
-        body: PlaybackInfoDto(
-          startTimeTicks: startPosition?.toRuntimeTicks,
-          audioStreamIndex: streamModel?.defaultAudioStreamIndex,
-          subtitleStreamIndex: streamModel?.defaultSubStreamIndex,
-          enableTranscoding: true,
-          autoOpenLiveStream: true,
-          deviceProfile: ref.read(videoProfileProvider),
-          userId: userId,
-          mediaSourceId: firstItemToPlay.id,
-        ),
-      );
-
-      PlaybackInfoResponse? playbackInfo = response.body;
-      if (playbackInfo == null) return null;
-
-      final mediaSource = playbackInfo.mediaSources?.first;
-
-      final mediaStreamsWithUrls = MediaStreamsModel.fromMediaStreamsList(
-              playbackInfo.mediaSources?.firstOrNull, playbackInfo.mediaSources?.firstOrNull?.mediaStreams ?? [], ref)
-          .copyWith(
-        defaultAudioStreamIndex: streamModel?.defaultAudioStreamIndex,
-        defaultSubStreamIndex: streamModel?.defaultSubStreamIndex,
-      );
-
-      final mediaSegments = await api.mediaSegmentsGet(id: item.id);
-      final trickPlay = (await api.getTrickPlay(item: fullItem.body, ref: ref))?.body;
-      final chapters = fullItem.body?.overview.chapters ?? [];
-
-      final mediaPath = isValidVideoUrl(mediaSource?.path ?? "");
-
-      if (mediaSource == null) return null;
-
-      if ((mediaSource.supportsDirectStream ?? false) || (mediaSource.supportsDirectPlay ?? false)) {
-        final Map<String, String?> directOptions = {
-          'Static': 'true',
-          'mediaSourceId': mediaSource.id,
-          'api_key': ref.read(userProvider)?.credentials.token,
-        };
-
-        if (mediaSource.eTag != null) {
-          directOptions['Tag'] = mediaSource.eTag;
-        }
-
-        if (mediaSource.liveStreamId != null) {
-          directOptions['LiveStreamId'] = mediaSource.liveStreamId;
-        }
-
-        final params = Uri(queryParameters: directOptions).query;
-        final apiKey = ref.read(userProvider)?.credentials.token ?? "";
-        final directDownloadUrl = await getDirectDownloadUrl(mediaSource.id, apiKey);
-
-        return DirectPlaybackModel(
-          item: fullItem.body ?? item,
-          queue: queue,
-          mediaSegments: mediaSegments?.body,
-          chapters: chapters,
-          playbackInfo: playbackInfo,
-          trickPlay: trickPlay,
-          media: Media(url: directDownloadUrl ?? "${ref.read(userProvider)?.server ?? ""}/Videos/${mediaSource.id}/stream"),
-          mediaStreams: mediaStreamsWithUrls,
-        );
-      } else if ((mediaSource.supportsTranscoding ?? false) && mediaSource.transcodingUrl != null) {
+    return DirectPlaybackModel(
+      item: fullItem.body ?? item,
+      queue: queue,
+      mediaSegments: mediaSegments?.body,
+      chapters: chapters,
+      playbackInfo: playbackInfo,
+      trickPlay: trickPlay,
+      media: Media(url: directDownloadUrl.isNotEmpty ? directDownloadUrl : "${ref.read(userProvider)?.server ?? ""}/Videos/${mediaSource.id}/stream"),
+      mediaStreams: mediaStreamsWithUrls,
+    );
+  } else if ((mediaSource.supportsTranscoding ?? false) && mediaSource.transcodingUrl != null) {
         return TranscodePlaybackModel(
           item: fullItem.body ?? item,
           queue: queue,
