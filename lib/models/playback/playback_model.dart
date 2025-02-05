@@ -246,7 +246,7 @@ class PlaybackModelHelper {
         final fallbackUrl = await getDirectDownloadUrl(mediaSource?.id ?? "", apiKey);
         final mediaUrl = directDownloadUrl.isNotEmpty ? directDownloadUrl : fallbackUrl;
 
-        log('Using media URL: $mediaUrl'); // Log the URL to see which one is being used
+        
 
         
         return DirectPlaybackModel(
