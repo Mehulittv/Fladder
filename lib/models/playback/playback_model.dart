@@ -249,7 +249,7 @@ class PlaybackModelHelper {
           chapters: chapters,
           playbackInfo: playbackInfo,
           trickPlay: trickPlay,
-          media: Media(url: directDownloadUrl.isNotEmpty ? directDownloadUrl : "${ref.read(userProvider)?.server ?? ""}/Items/86ca77419e87a652a88f3218d5f9c140/Download?api_key=14c50a58572b4617a68060f1cf196f9c"),
+          media: Media(url: directDownloadUrl),
           mediaStreams: mediaStreamsWithUrls,
         );
       } else if ((mediaSource.supportsTranscoding ?? false) && mediaSource.transcodingUrl != null) {
