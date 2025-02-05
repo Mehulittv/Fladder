@@ -84,15 +84,15 @@ jobs:
 
       - name: Build Android APK and AAB
         run: |
-          flutter build apk --debug --build-number=${{github.run_number}} --flavor production
-          flutter build appbundle --debug --build-number=${{github.run_number}} --flavor production
+          flutter build apk --release --build-number=${{github.run_number}} --flavor production
+          flutter build appbundle --release --build-number=${{github.run_number}} --flavor production
 
 
       - name: Rename APK and AAB
         run: |
           mkdir -p build/app/outputs/android_artifacts
-          mv build/app/outputs/flutter-apk/app-production-debug.apk "build/app/outputs/android_artifacts/release-signed.apk"
-          mv build/app/outputs/bundle/productionDebug/app-production-debug.aab "build/app/outputs/android_artifacts/release-signed.aab"
+          mv build/app/outputs/flutter-apk/app-production-release.apk "build/app/outputs/android_artifacts/release-signed.apk"
+          mv build/app/outputs/bundle/productionRelease/app-production-release.aab "build/app/outputs/android_artifacts/release-signed.aab"
       - name: Archive Android artifacts
         uses: actions/upload-artifact@v4.0.0
         with:
