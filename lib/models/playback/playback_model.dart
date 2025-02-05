@@ -37,7 +37,7 @@ class Media {
 
 
 Future<String> getDirectDownloadUrl(String itemId, String apiKey) async {
-  final url = "https://jellyfin.vflix.xyz/Items/$itemId/Download?api_key=$apiKey";
+  final url = "${ref.read(userProvider)?.server ?? ""}/Items/$itemId/Download?api_key=$apiKey";
   
   final response = await http.get(Uri.parse(url), headers: {
     'User-Agent': 'Mozilla/5.0',
