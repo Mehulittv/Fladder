@@ -1,8 +1,8 @@
 import 'dart:developer';
+import 'package:http/http.dart' as http;
 import 'package:chopper/chopper.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:fladder/jellyfin/jellyfin_open_api.swagger.dart';
 import 'package:fladder/models/item_base_model.dart';
 import 'package:fladder/models/items/chapters_model.dart';
@@ -48,6 +48,7 @@ Future<String> getDirectDownloadUrl(String itemId, String apiKey) async {
     return "";
   }
 }
+
 extension PlaybackModelExtension on PlaybackModel? {
   SubStreamModel? get defaultSubStream =>
       this?.subStreams?.firstWhereOrNull((element) => element.index == this?.mediaStreams?.defaultSubStreamIndex);
@@ -175,7 +176,7 @@ class PlaybackModelHelper {
     };
 
     final response = await api.usersUserIdItemsItemIdGet(itemId: firstItemToPlay.id);
-    final fullItem = response.body;
+    final fullItem = response.body as PlaybackInfoResponse?;
     if (fullItem == null) return null;
 
     final mediaSources = fullItem.mediaSources;
@@ -191,7 +192,7 @@ class PlaybackModelHelper {
     final directDownloadUrl = await getDirectDownloadUrl(mediaSource.id ?? "", apiKey);
 
     return DirectPlaybackModel(
-      item: fullItem,
+      item: item,
       queue: queue,
       mediaSegments: mediaSegments?.body,
       chapters: chapters,
