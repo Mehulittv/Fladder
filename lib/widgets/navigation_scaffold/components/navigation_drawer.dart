@@ -6,7 +6,6 @@ import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:fladder/models/collection_types.dart';
-import 'package:fladder/models/settings/home_settings_model.dart';
 import 'package:fladder/models/view_model.dart';
 import 'package:fladder/routes/auto_router.gr.dart';
 import 'package:fladder/screens/metadata/refresh_metadata.dart';
@@ -117,11 +116,11 @@ class NestedNavigationDrawer extends ConsumerWidget {
               selected: currentLocation.contains(const SettingsRoute().routeName),
               icon: const SizedBox(width: 35, height: 35, child: SettingsUserIcon()),
               onPressed: () {
-                switch (AdaptiveLayout.layoutModeOf(context)) {
-                  case LayoutMode.single:
+                switch (AdaptiveLayout.of(context).size) {
+                  case ScreenLayout.single:
                     const SettingsRoute().push(context);
                     break;
-                  case LayoutMode.dual:
+                  case ScreenLayout.dual:
                     context.router.push(const ClientSettingsRoute());
                     break;
                 }
@@ -136,11 +135,11 @@ class NestedNavigationDrawer extends ConsumerWidget {
             icon: const Icon(IconsaxOutline.setting_2),
             selected: currentLocation.contains(const SettingsRoute().routeName),
             onPressed: () {
-              switch (AdaptiveLayout.layoutModeOf(context)) {
-                case LayoutMode.single:
+              switch (AdaptiveLayout.of(context).size) {
+                case ScreenLayout.single:
                   const SettingsRoute().push(context);
                   break;
-                case LayoutMode.dual:
+                case ScreenLayout.dual:
                   context.router.push(const ClientSettingsRoute());
                   break;
               }

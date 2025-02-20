@@ -75,8 +75,7 @@ class _CurrentlyPlayingBarState extends ConsumerState<FloatingPlayerBar> {
           fladderSnackbar(context, title: "Swipe up/down to open/close the player");
         },
         child: Card(
-          elevation: 5,
-          color: Theme.of(context).colorScheme.primaryContainer,
+          elevation: 3,
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 50, maxHeight: 85),
             child: LayoutBuilder(builder: (context, constraints) {

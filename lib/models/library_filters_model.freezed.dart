@@ -21,8 +21,9 @@ LibraryFiltersModel _$LibraryFiltersModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$LibraryFiltersModel {
   String get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
-  bool get isFavourite => throw _privateConstructorUsedError;
+  String get name =>
+      throw _privateConstructorUsedError; // ignore: unused_element
+  dynamic get isFavourite => throw _privateConstructorUsedError;
   List<String> get ids => throw _privateConstructorUsedError;
   Map<String, bool> get genres => throw _privateConstructorUsedError;
   Map<ItemFilter, bool> get filters => throw _privateConstructorUsedError;
@@ -58,7 +59,7 @@ abstract class $LibraryFiltersModelCopyWith<$Res> {
   $Res call(
       {String id,
       String name,
-      bool isFavourite,
+      dynamic isFavourite,
       List<String> ids,
       Map<String, bool> genres,
       Map<ItemFilter, bool> filters,
@@ -92,7 +93,7 @@ class _$LibraryFiltersModelCopyWithImpl<$Res, $Val extends LibraryFiltersModel>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? isFavourite = null,
+    Object? isFavourite = freezed,
     Object? ids = null,
     Object? genres = null,
     Object? filters = null,
@@ -117,10 +118,10 @@ class _$LibraryFiltersModelCopyWithImpl<$Res, $Val extends LibraryFiltersModel>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      isFavourite: null == isFavourite
+      isFavourite: freezed == isFavourite
           ? _value.isFavourite
           : isFavourite // ignore: cast_nullable_to_non_nullable
-              as bool,
+              as dynamic,
       ids: null == ids
           ? _value.ids
           : ids // ignore: cast_nullable_to_non_nullable
@@ -192,7 +193,7 @@ abstract class _$$LibraryFiltersModelImplCopyWith<$Res>
   $Res call(
       {String id,
       String name,
-      bool isFavourite,
+      dynamic isFavourite,
       List<String> ids,
       Map<String, bool> genres,
       Map<ItemFilter, bool> filters,
@@ -224,7 +225,7 @@ class __$$LibraryFiltersModelImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? isFavourite = null,
+    Object? isFavourite = freezed,
     Object? ids = null,
     Object? genres = null,
     Object? filters = null,
@@ -249,10 +250,7 @@ class __$$LibraryFiltersModelImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      isFavourite: null == isFavourite
-          ? _value.isFavourite
-          : isFavourite // ignore: cast_nullable_to_non_nullable
-              as bool,
+      isFavourite: freezed == isFavourite ? _value.isFavourite! : isFavourite,
       ids: null == ids
           ? _value._ids
           : ids // ignore: cast_nullable_to_non_nullable
@@ -319,7 +317,7 @@ class _$LibraryFiltersModelImpl extends _LibraryFiltersModel {
   _$LibraryFiltersModelImpl(
       {required this.id,
       required this.name,
-      required this.isFavourite,
+      this.isFavourite = false,
       required final List<String> ids,
       required final Map<String, bool> genres,
       required final Map<ItemFilter, bool> filters,
@@ -351,8 +349,10 @@ class _$LibraryFiltersModelImpl extends _LibraryFiltersModel {
   final String id;
   @override
   final String name;
+// ignore: unused_element
   @override
-  final bool isFavourite;
+  @JsonKey()
+  final dynamic isFavourite;
   final List<String> _ids;
   @override
   List<String> get ids {
@@ -443,8 +443,8 @@ class _$LibraryFiltersModelImpl extends _LibraryFiltersModel {
             other is _$LibraryFiltersModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.isFavourite, isFavourite) ||
-                other.isFavourite == isFavourite) &&
+            const DeepCollectionEquality()
+                .equals(other.isFavourite, isFavourite) &&
             const DeepCollectionEquality().equals(other._ids, _ids) &&
             const DeepCollectionEquality().equals(other._genres, _genres) &&
             const DeepCollectionEquality().equals(other._filters, _filters) &&
@@ -473,7 +473,7 @@ class _$LibraryFiltersModelImpl extends _LibraryFiltersModel {
       runtimeType,
       id,
       name,
-      isFavourite,
+      const DeepCollectionEquality().hash(isFavourite),
       const DeepCollectionEquality().hash(_ids),
       const DeepCollectionEquality().hash(_genres),
       const DeepCollectionEquality().hash(_filters),
@@ -510,7 +510,7 @@ abstract class _LibraryFiltersModel extends LibraryFiltersModel {
   factory _LibraryFiltersModel(
       {required final String id,
       required final String name,
-      required final bool isFavourite,
+      final dynamic isFavourite,
       required final List<String> ids,
       required final Map<String, bool> genres,
       required final Map<ItemFilter, bool> filters,
@@ -533,9 +533,9 @@ abstract class _LibraryFiltersModel extends LibraryFiltersModel {
   @override
   String get id;
   @override
-  String get name;
+  String get name; // ignore: unused_element
   @override
-  bool get isFavourite;
+  dynamic get isFavourite;
   @override
   List<String> get ids;
   @override

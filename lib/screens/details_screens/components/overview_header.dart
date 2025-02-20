@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:fladder/models/items/images_models.dart';
 import 'package:fladder/models/items/item_shared_models.dart';
-import 'package:fladder/models/settings/home_settings_model.dart';
 import 'package:fladder/screens/shared/media/components/chip_button.dart';
 import 'package:fladder/screens/shared/media/components/media_header.dart';
 import 'package:fladder/screens/shared/media/components/small_detail_widgets.dart';
@@ -56,7 +55,7 @@ class OverviewHeader extends ConsumerWidget {
         (MediaQuery.sizeOf(context).height - (MediaQuery.paddingOf(context).top + 150)).clamp(50, 1250).toDouble();
 
     final crossAlignment =
-        AdaptiveLayout.viewSizeOf(context) != ViewSize.phone ? CrossAxisAlignment.start : CrossAxisAlignment.center;
+        AdaptiveLayout.of(context).layout != LayoutState.phone ? CrossAxisAlignment.start : CrossAxisAlignment.center;
 
     return ConstrainedBox(
       constraints: BoxConstraints(

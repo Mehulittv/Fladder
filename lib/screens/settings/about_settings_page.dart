@@ -24,13 +24,13 @@ class _Socials {
 
 const socials = [
   _Socials(
-    'Github',
-    'https://github.com/DonutWare/Fladder',
+    'Telegram',
+    'https://t.me/vflixprime2',
     FontAwesomeIcons.githubAlt,
   ),
   _Socials(
-    'Weblate',
-    'https://hosted.weblate.org/projects/fladder/',
+    'Telegram',
+    'https://t.me/vflixprime2',
     IconsaxOutline.global,
   ),
 ];
@@ -91,7 +91,7 @@ class AboutSettingsPage extends ConsumerWidget {
                   context: context,
                   applicationIcon: const FladderIcon(size: 55),
                   applicationVersion: applicationInfo.versionPlatformBuild,
-                  applicationLegalese: "DonutWare",
+                  applicationLegalese: "VFlix Prime",
                 ),
                 child: Text(context.localized.aboutLicenses),
               )

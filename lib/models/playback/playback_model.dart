@@ -1,10 +1,8 @@
 import 'dart:developer';
-
+import 'package:http/http.dart' as http;
 import 'package:chopper/chopper.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart';
-
 import 'package:fladder/jellyfin/jellyfin_open_api.swagger.dart';
 import 'package:fladder/models/item_base_model.dart';
 import 'package:fladder/models/items/chapters_model.dart';
@@ -36,6 +34,9 @@ class Media {
     required this.url,
   });
 }
+
+
+
 
 extension PlaybackModelExtension on PlaybackModel? {
   SubStreamModel? get defaultSubStream =>
@@ -148,8 +149,21 @@ class PlaybackModelHelper {
       return EpisodeModel.fromBaseDto(episode, ref);
     }
   }
+ 
+Future<String> getDirectDownloadUrl(String itemId, String apiKey) async {
+  final url = "${ref.read(userProvider)?.server ?? ""}/Items/$itemId/Download?api_key=$apiKey";
+  
+  final response = await http.get(Uri.parse(url), headers: {
+    'User-Agent': 'Mozilla/5.0',
+  });
 
-  Future<PlaybackModel?> createServerPlaybackModel(ItemBaseModel? item, PlaybackType? type,
+  if (response.statusCode == 200) {
+    return response.body;  // Return the response output
+  } else {
+    return "";
+  }
+}
+ Future<PlaybackModel?> createServerPlaybackModel(ItemBaseModel? item, PlaybackType? type,
       {PlaybackModel? oldModel, List<ItemBaseModel>? libraryQueue, Duration? startPosition}) async {
     try {
       if (item == null) return null;
@@ -204,6 +218,9 @@ class PlaybackModelHelper {
       final mediaSegments = await api.mediaSegmentsGet(id: item.id);
       final trickPlay = (await api.getTrickPlay(item: fullItem.body, ref: ref))?.body;
       final chapters = fullItem.body?.overview.chapters ?? [];
+      
+      final apiKey = ref.read(userProvider)?.credentials.token ?? "";
+      final directDownloadUrl = await getDirectDownloadUrl(mediaSource?.id ?? "", apiKey); 
 
       final mediaPath = isValidVideoUrl(mediaSource?.path ?? "");
 
@@ -225,8 +242,13 @@ class PlaybackModelHelper {
         }
 
         final params = Uri(queryParameters: directOptions).query;
-        final playbackUrl = joinAll([ref.read(userProvider)!.server, "Videos", mediaSource.id!, "stream?$params"]);
+       
+        final fallbackUrl = await getDirectDownloadUrl(mediaSource?.id ?? "", apiKey);
+        final mediaUrl = directDownloadUrl.isNotEmpty ? directDownloadUrl : fallbackUrl;
 
+        
+
+        
         return DirectPlaybackModel(
           item: fullItem.body ?? item,
           queue: queue,
@@ -234,9 +256,7 @@ class PlaybackModelHelper {
           chapters: chapters,
           playbackInfo: playbackInfo,
           trickPlay: trickPlay,
-          media: Media(
-            url: mediaPath ?? playbackUrl,
-          ),
+          media: Media(url: mediaUrl), 
           mediaStreams: mediaStreamsWithUrls,
         );
       } else if ((mediaSource.supportsTranscoding ?? false) && mediaSource.transcodingUrl != null) {
@@ -257,6 +277,9 @@ class PlaybackModelHelper {
       return null;
     }
   }
+
+
+  
 
   String? isValidVideoUrl(String path) {
     Uri? uri = Uri.tryParse(path);

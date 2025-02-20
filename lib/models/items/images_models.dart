@@ -12,6 +12,7 @@ import 'package:fladder/jellyfin/jellyfin_open_api.enums.swagger.dart' as enums;
 import 'package:fladder/jellyfin/jellyfin_open_api.swagger.dart' as dto;
 import 'package:fladder/providers/image_provider.dart';
 import 'package:fladder/util/custom_cache_manager.dart';
+import 'package:fladder/util/jelly_id.dart';
 
 class ImagesData {
   final ImageData? primary;
@@ -34,80 +35,74 @@ class ImagesData {
 
   ImageData? get randomBackDrop => (backDrop?..shuffle())?.firstOrNull ?? primary;
 
-  static ImagesData? fromBaseItem(
+  factory ImagesData.fromBaseItem(
     dto.BaseItemDto item,
     Ref ref, {
     Size backDrop = const Size(2000, 2000),
     Size logo = const Size(1000, 1000),
     Size primary = const Size(600, 600),
     bool getOriginalSize = false,
-    int quality = 95,
+    int quality = 90,
   }) {
-    final itemid = item.id;
-    if (itemid == null) return null;
-    final imageProvider = ref.read(imageUtilityProvider);
     final newImgesData = ImagesData(
       primary: item.imageTags?['Primary'] != null
           ? ImageData(
               path: getOriginalSize
-                  ? imageProvider.getItemsOrigImageUrl(
-                      itemid,
-                      type: enums.ImageType.primary,
-                    )
-                  : imageProvider.getItemsImageUrl(
-                      itemid,
-                      type: enums.ImageType.primary,
-                      maxHeight: primary.height.toInt(),
-                      maxWidth: primary.width.toInt(),
-                      quality: quality,
-                    ),
+                  ? ref.read(imageUtilityProvider).getItemsOrigImageUrl(
+                        item.id!,
+                        type: enums.ImageType.primary,
+                      )
+                  : ref.read(imageUtilityProvider).getItemsImageUrl(
+                        (item.id!),
+                        type: enums.ImageType.primary,
+                        maxHeight: primary.height.toInt(),
+                        maxWidth: primary.width.toInt(),
+                        quality: quality,
+                      ),
               key: item.imageTags?['Primary'],
-              hash: item.imageBlurHashes?.primary?[item.imageTags?['Primary']] ?? "",
+              hash: item.imageBlurHashes?.primary?[item.imageTags?['Primary']] as String? ?? "",
             )
           : null,
       logo: item.imageTags?['Logo'] != null
           ? ImageData(
               path: getOriginalSize
-                  ? imageProvider.getItemsOrigImageUrl(
-                      itemid,
-                      type: enums.ImageType.logo,
-                    )
-                  : imageProvider.getItemsImageUrl(
-                      itemid,
-                      type: enums.ImageType.logo,
-                      maxHeight: logo.height.toInt(),
-                      maxWidth: logo.width.toInt(),
-                      quality: quality,
-                    ),
-              key: item.imageTags?['Logo'],
-              hash: item.imageBlurHashes?.logo?[item.imageTags?['Logo']] ?? "")
-          : null,
-      backDrop: (item.backdropImageTags ?? [])
-          .mapIndexed(
-            (index, backdrop) {
-              final image = ImageData(
-                path: getOriginalSize
-                    ? imageProvider.getBackdropOrigImage(
-                        itemid,
-                        index,
-                        backdrop,
+                  ? ref.read(imageUtilityProvider).getItemsOrigImageUrl(
+                        item.id!,
+                        type: enums.ImageType.logo,
                       )
-                    : imageProvider.getBackdropImage(
-                        itemid,
-                        index,
-                        backdrop,
-                        maxHeight: backDrop.height.toInt(),
-                        maxWidth: backDrop.width.toInt(),
+                  : ref.read(imageUtilityProvider).getItemsImageUrl(
+                        (item.id!),
+                        type: enums.ImageType.logo,
+                        maxHeight: logo.height.toInt(),
+                        maxWidth: logo.width.toInt(),
                         quality: quality,
                       ),
-                key: backdrop,
-                hash: item.imageBlurHashes?.backdrop?[backdrop] ?? "",
-              );
-              return image;
-            },
-          )
-          .nonNulls
-          .toList(),
+              key: item.imageTags?['Logo'],
+              hash: item.imageBlurHashes?.logo?[item.imageTags?['Logo']] as String? ?? "")
+          : null,
+      backDrop: (item.backdropImageTags ?? []).mapIndexed(
+        (index, backdrop) {
+          final image = ImageData(
+            path: getOriginalSize
+                ? ref.read(imageUtilityProvider).getBackdropOrigImage(
+                      item.id!,
+                      index,
+                      backdrop,
+                    )
+                : ref.read(imageUtilityProvider).getBackdropImage(
+                      (item.id!),
+                      index,
+                      backdrop,
+                      maxHeight: backDrop.height.toInt(),
+                      maxWidth: backDrop.width.toInt(),
+                      quality: quality,
+                    ),
+            key: backdrop,
+            hash: item.imageBlurHashes?.backdrop?[backdrop] ?? jellyId,
+          );
+          return image;
+        },
+      ).toList(),
     );
     return newImgesData;
   }
@@ -118,59 +113,51 @@ class ImagesData {
     Size backDrop = const Size(2000, 2000),
     Size logo = const Size(1000, 1000),
     Size primary = const Size(600, 600),
-    int quality = 95,
+    int quality = 90,
   }) {
     if (item.seriesId == null && item.parentId == null) return null;
-
-    final imageProvider = ref.read(imageUtilityProvider);
-
     final newImgesData = ImagesData(
       primary: (item.seriesPrimaryImageTag != null)
           ? ImageData(
-              path: imageProvider.getItemsImageUrl(
-                item.seriesId,
-                type: enums.ImageType.primary,
-                maxHeight: primary.height.toInt(),
-                maxWidth: primary.width.toInt(),
-                quality: quality,
-              ),
+              path: ref.read(imageUtilityProvider).getItemsImageUrl(
+                    (item.seriesId!),
+                    type: enums.ImageType.primary,
+                    maxHeight: primary.height.toInt(),
+                    maxWidth: primary.width.toInt(),
+                    quality: quality,
+                  ),
               key: item.seriesPrimaryImageTag ?? "",
-              hash: item.imageBlurHashes?.primary?[item.seriesPrimaryImageTag] ?? "")
+              hash: item.imageBlurHashes?.primary?[item.seriesPrimaryImageTag] as String? ?? "")
           : null,
       logo: (item.parentLogoImageTag != null)
           ? ImageData(
-              path: imageProvider.getItemsImageUrl(
-                item.seriesId,
-                type: enums.ImageType.logo,
-                maxHeight: logo.height.toInt(),
-                maxWidth: logo.width.toInt(),
-                quality: quality,
-              ),
+              path: ref.read(imageUtilityProvider).getItemsImageUrl(
+                    (item.seriesId!),
+                    type: enums.ImageType.logo,
+                    maxHeight: logo.height.toInt(),
+                    maxWidth: logo.width.toInt(),
+                    quality: quality,
+                  ),
               key: item.parentLogoImageTag ?? "",
-              hash: item.imageBlurHashes?.logo?[item.parentLogoImageTag] ?? "")
+              hash: item.imageBlurHashes?.logo?[item.parentLogoImageTag] as String? ?? "")
           : null,
-      backDrop: (item.backdropImageTags ?? [])
-          .mapIndexed(
-            (index, backdrop) {
-              final itemId = item.seriesId ?? item.parentId;
-              if (itemId == null) return null;
-              final image = ImageData(
-                path: imageProvider.getBackdropImage(
-                  itemId,
+      backDrop: (item.backdropImageTags ?? []).mapIndexed(
+        (index, backdrop) {
+          final image = ImageData(
+            path: ref.read(imageUtilityProvider).getBackdropImage(
+                  ((item.seriesId ?? item.parentId)!),
                   index,
                   backdrop,
                   maxHeight: backDrop.height.toInt(),
                   maxWidth: backDrop.width.toInt(),
                   quality: quality,
                 ),
-                key: backdrop,
-                hash: item.imageBlurHashes?.backdrop?[backdrop] ?? "",
-              );
-              return image;
-            },
-          )
-          .nonNulls
-          .toList(),
+            key: backdrop,
+            hash: item.imageBlurHashes?.backdrop?[backdrop],
+          );
+          return image;
+        },
+      ).toList(),
     );
     return newImgesData;
   }
@@ -181,7 +168,7 @@ class ImagesData {
     Size backDrop = const Size(2000, 2000),
     Size logo = const Size(1000, 1000),
     Size primary = const Size(2000, 2000),
-    int quality = 95,
+    int quality = 90,
   }) {
     return ImagesData(
       primary: (item.primaryImageTag != null && item.imageBlurHashes != null)
@@ -194,7 +181,7 @@ class ImagesData {
                     quality: quality,
                   ),
               key: item.primaryImageTag ?? "",
-              hash: item.imageBlurHashes?.primary?[item.primaryImageTag] ?? '')
+              hash: item.imageBlurHashes?.primary?[item.primaryImageTag] as String? ?? jellyId)
           : null,
       logo: null,
       backDrop: null,

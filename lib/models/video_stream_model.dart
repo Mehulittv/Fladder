@@ -104,7 +104,7 @@ class VideoStream {
   final MediaStreamsModel? mediaStreamsModel;
 
   AudioStreamModel? get currentAudioStream {
-    if (audioStreamIndex == -1 || audioStreamIndex == null) {
+    if (audioStreamIndex == -1) {
       return null;
     }
     return mediaStreamsModel?.audioStreams.firstWhereOrNull(
@@ -112,7 +112,7 @@ class VideoStream {
   }
 
   SubStreamModel? get currentSubStream {
-    if (subtitleStreamIndex == -1 || subtitleStreamIndex == null) {
+    if (subtitleStreamIndex == -1) {
       return null;
     }
     return mediaStreamsModel?.subStreams.firstWhereOrNull(

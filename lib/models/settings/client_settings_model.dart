@@ -27,7 +27,7 @@ class ClientSettingsModel with _$ClientSettingsModel {
     @Default(false) bool blurUpcomingEpisodes,
     @LocaleConvert() Locale? selectedLocale,
     @Default(true) bool enableMediaKeys,
-    @Default(1.0) double posterSize,
+    @Default(0.7) double posterSize,
     @Default(false) bool pinchPosterZoom,
     @Default(false) bool mouseDragSupport,
     @Default(true) bool requireWifi,

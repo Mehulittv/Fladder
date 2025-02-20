@@ -18,7 +18,6 @@ import 'package:universal_html/html.dart' as html;
 import 'package:window_manager/window_manager.dart';
 
 import 'package:fladder/models/account_model.dart';
-import 'package:fladder/models/settings/home_settings_model.dart';
 import 'package:fladder/models/syncing/i_synced_item.dart';
 import 'package:fladder/providers/crash_log_provider.dart';
 import 'package:fladder/providers/settings/client_settings_provider.dart';
@@ -26,7 +25,6 @@ import 'package:fladder/providers/shared_provider.dart';
 import 'package:fladder/providers/sync_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/providers/video_player_provider.dart';
-import 'package:fladder/routes/auto_router.dart';
 import 'package:fladder/routes/auto_router.gr.dart';
 import 'package:fladder/screens/login/lock_screen.dart';
 import 'package:fladder/theme.dart';
@@ -102,11 +100,11 @@ void main() async {
             ))
       ],
       child: AdaptiveLayoutBuilder(
-        fallBack: ViewSize.tablet,
+        fallBack: LayoutState.tablet,
         layoutPoints: [
-          LayoutPoints(start: 0, end: 599, type: ViewSize.phone),
-          LayoutPoints(start: 600, end: 1919, type: ViewSize.tablet),
-          LayoutPoints(start: 1920, end: 3180, type: ViewSize.desktop),
+          LayoutPoints(start: 0, end: 599, type: LayoutState.phone),
+          LayoutPoints(start: 600, end: 1919, type: LayoutState.tablet),
+          LayoutPoints(start: 1920, end: 3180, type: LayoutState.desktop),
         ],
         child: const Main(),
       ),
@@ -124,7 +122,6 @@ class Main extends ConsumerStatefulWidget with WindowListener {
 class _MainState extends ConsumerState<Main> with WindowListener, WidgetsBindingObserver {
   DateTime dateTime = DateTime.now();
   bool hidden = false;
-  late final autoRouter = AutoRouter(ref: ref);
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
@@ -162,7 +159,7 @@ class _MainState extends ConsumerState<Main> with WindowListener, WidgetsBinding
       await ref.read(videoPlayerProvider).pause();
 
       if (context.mounted) {
-        autoRouter.push(const LockRoute());
+        AdaptiveLayout.of(context).router.push(const LockRoute());
       }
     }
   }
@@ -301,8 +298,7 @@ class _MainState extends ConsumerState<Main> with WindowListener, WidgetsBinding
               ),
             ),
             themeMode: themeMode,
-            routerConfig: autoRouter.config(),
-            // routerConfig: AdaptiveLayout.routerOf(context).config(),
+            routerConfig: AdaptiveLayout.routerOf(context).config(),
           ),
         );
       }),

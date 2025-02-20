@@ -1,15 +1,12 @@
-import 'package:flutter/material.dart';
-
 import 'package:collection/collection.dart';
 import 'package:ficonsax/ficonsax.dart';
-
-import 'package:fladder/models/settings/home_settings_model.dart';
 import 'package:fladder/util/adaptive_layout.dart';
 import 'package:fladder/util/list_padding.dart';
 import 'package:fladder/util/localization_helper.dart';
 import 'package:fladder/util/map_bool_helper.dart';
 import 'package:fladder/widgets/shared/modal_bottom_sheet.dart';
 import 'package:fladder/widgets/shared/modal_side_sheet.dart';
+import 'package:flutter/material.dart';
 
 class CategoryChip<T> extends StatelessWidget {
   final Map<T, bool> items;
@@ -129,7 +126,7 @@ class CategoryChip<T> extends StatelessWidget {
           ].addInBetween(const SizedBox(width: 6)),
         );
 
-    if (AdaptiveLayout.viewSizeOf(context) != ViewSize.phone) {
+    if (AdaptiveLayout.of(context).layout != LayoutState.phone) {
       await showModalSideSheet(
         context,
         addDivider: true,

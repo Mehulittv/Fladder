@@ -5,7 +5,6 @@ import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:fladder/models/item_base_model.dart';
-import 'package:fladder/models/settings/home_settings_model.dart';
 import 'package:fladder/providers/items/episode_details_provider.dart';
 import 'package:fladder/providers/user_provider.dart';
 import 'package:fladder/screens/details_screens/components/media_stream_information.dart';
@@ -44,7 +43,7 @@ class _ItemDetailScreenState extends ConsumerState<EpisodeDetailScreen> {
     final seasonDetails = details.series;
     final episodeDetails = details.episode;
     final wrapAlignment =
-        AdaptiveLayout.viewSizeOf(context) != ViewSize.phone ? WrapAlignment.start : WrapAlignment.center;
+        AdaptiveLayout.of(context).layout != LayoutState.phone ? WrapAlignment.start : WrapAlignment.center;
 
     return DetailScaffold(
       label: widget.item.name,

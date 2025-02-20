@@ -111,7 +111,7 @@
   },
   "ascending": "ஏறுதல்",
   "@ascending": {},
-  "audio": "ஒலி தேர்வு",
+  "audio": "ஆடியோ",
   "@audio": {},
   "autoPlay": "தானாக விளையாடும்",
   "@autoPlay": {},
@@ -145,7 +145,7 @@
   },
   "clear": "தெளிவான",
   "@clear": {},
-  "clearSelection": "தேர்வை நீக்கு",
+  "clearSelection": "தெளிவான தேர்வு",
   "@clearSelection": {},
   "close": "மூடு",
   "@close": {},
@@ -1207,7 +1207,5 @@
   "active": "செயலில்",
   "@active": {},
   "errorLogs": "பிழை பதிவுகள்",
-  "@errorLogs": {},
-  "external": "வெளிப்புற",
-  "@external": {}
+  "@errorLogs": {}
 }

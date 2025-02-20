@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:auto_route/auto_route.dart';
 import 'package:collection/collection.dart';
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:fladder/models/settings/home_settings_model.dart';
 import 'package:fladder/providers/settings/client_settings_provider.dart';
 import 'package:fladder/providers/views_provider.dart';
-import 'package:fladder/routes/auto_router.dart';
 import 'package:fladder/routes/auto_router.gr.dart';
 import 'package:fladder/screens/shared/animated_fade_size.dart';
 import 'package:fladder/util/adaptive_layout.dart';
@@ -53,8 +50,6 @@ class _NavigationBodyState extends ConsumerState<NavigationBody> {
   @override
   Widget build(BuildContext context) {
     final views = ref.watch(viewsProvider.select((value) => value.views));
-    final hasOverlay = AdaptiveLayout.layoutModeOf(context) == LayoutMode.dual ||
-        homeRoutes.any((element) => element.name.contains(context.router.current.name));
     ref.listen(
       clientSettingsProvider,
       (previous, next) {
@@ -67,64 +62,46 @@ class _NavigationBodyState extends ConsumerState<NavigationBody> {
     );
 
     return switch (AdaptiveLayout.layoutOf(context)) {
-      ViewSize.phone => MediaQuery.removePadding(
+      LayoutState.phone => MediaQuery.removePadding(
           context: widget.parentContext,
           child: widget.child,
         ),
-      ViewSize.tablet => Row(
+      LayoutState.tablet => Row(
           children: [
-            AnimatedFadeSize(
-              duration: const Duration(milliseconds: 250),
-              child: hasOverlay ? navigationRail(context) : const SizedBox(),
-            ),
+            navigationRail(context),
             Flexible(
-              child: MediaQuery(
-                data: semiNestedPadding(context, hasOverlay),
-                child: widget.child,
-              ),
+              child: widget.child,
             )
           ],
         ),
-      ViewSize.desktop => Row(
+      LayoutState.desktop => Row(
           children: [
             AnimatedFadeSize(
               duration: const Duration(milliseconds: 125),
-              child: hasOverlay
-                  ? expandedSideBar
-                      ? MediaQuery.removePadding(
-                          context: widget.parentContext,
-                          child: NestedNavigationDrawer(
-                            isExpanded: expandedSideBar,
-                            actionButton: actionButton(),
-                            toggleExpanded: (value) {
-                              setState(() {
-                                expandedSideBar = value;
-                              });
-                            },
-                            views: views,
-                            destinations: widget.destinations,
-                            currentLocation: widget.currentLocation,
-                          ),
-                        )
-                      : navigationRail(context)
-                  : const SizedBox(),
+              child: expandedSideBar
+                  ? MediaQuery.removePadding(
+                      context: widget.parentContext,
+                      child: NestedNavigationDrawer(
+                        isExpanded: expandedSideBar,
+                        actionButton: actionButton(),
+                        toggleExpanded: (value) {
+                          setState(() {
+                            expandedSideBar = value;
+                          });
+                        },
+                        views: views,
+                        destinations: widget.destinations,
+                        currentLocation: widget.currentLocation,
+                      ),
+                    )
+                  : navigationRail(context),
             ),
             Flexible(
-              child: MediaQuery(
-                data: semiNestedPadding(context, hasOverlay),
-                child: widget.child,
-              ),
+              child: widget.child,
             ),
           ],
         )
     };
-  }
-
-  MediaQueryData semiNestedPadding(BuildContext context, bool hasOverlay) {
-    final paddingOf = MediaQuery.paddingOf(context);
-    return MediaQuery.of(context).copyWith(
-      padding: paddingOf.copyWith(left: hasOverlay ? 0 : paddingOf.left),
-    );
   }
 
   AdaptiveFab? actionButton() {
@@ -143,8 +120,7 @@ class _NavigationBodyState extends ConsumerState<NavigationBody> {
             style: Theme.of(context).textTheme.titleSmall,
           ),
         },
-        if (AdaptiveLayout.of(context).platform == TargetPlatform.macOS)
-          SizedBox(height: MediaQuery.of(context).padding.top),
+        if (AdaptiveLayout.of(context).platform == TargetPlatform.macOS) SizedBox(height: MediaQuery.of(context).padding.top),
         Flexible(
           child: Padding(
             key: const Key('navigation_rail'),
@@ -154,7 +130,7 @@ class _NavigationBodyState extends ConsumerState<NavigationBody> {
               children: [
                 IconButton(
                   onPressed: () {
-                    if (AdaptiveLayout.layoutOf(context) != ViewSize.desktop) {
+                    if (AdaptiveLayout.layoutOf(context) != LayoutState.desktop) {
                       widget.drawerKey.currentState?.openDrawer();
                     } else {
                       setState(() {
@@ -164,7 +140,7 @@ class _NavigationBodyState extends ConsumerState<NavigationBody> {
                   },
                   icon: const Icon(IconsaxBold.menu),
                 ),
-                if (AdaptiveLayout.layoutModeOf(context) == LayoutMode.dual) ...[
+                if (AdaptiveLayout.of(context).size == ScreenLayout.dual) ...[
                   const SizedBox(height: 8),
                   AnimatedFadeSize(
                     child: AnimatedSwitcher(

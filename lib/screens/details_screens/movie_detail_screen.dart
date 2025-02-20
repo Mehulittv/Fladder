@@ -1,4 +1,3 @@
-import 'package:fladder/models/settings/home_settings_model.dart';
 import 'package:fladder/util/adaptive_layout.dart';
 import 'package:flutter/material.dart';
 
@@ -40,7 +39,7 @@ class _ItemDetailScreenState extends ConsumerState<MovieDetailScreen> {
   Widget build(BuildContext context) {
     final details = ref.watch(providerInstance);
     final wrapAlignment =
-        AdaptiveLayout.viewSizeOf(context) != ViewSize.phone ? WrapAlignment.start : WrapAlignment.center;
+        AdaptiveLayout.of(context).layout != LayoutState.phone ? WrapAlignment.start : WrapAlignment.center;
 
     return DetailScaffold(
       label: widget.item.name,

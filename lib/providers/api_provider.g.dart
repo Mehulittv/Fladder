@@ -6,7 +6,7 @@ part of 'api_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$jellyApiHash() => r'9bc824d28d17f88f40c768cefb637144e0fbf346';
+String _$jellyApiHash() => r'c0cdc4127e7191523b1356e71c54c93f99020c1e';
 
 /// See also [JellyApi].
 @ProviderFor(JellyApi)

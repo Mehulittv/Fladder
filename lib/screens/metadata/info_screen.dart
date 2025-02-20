@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:ficonsax/ficonsax.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fladder/models/information_model.dart';
 import 'package:fladder/models/item_base_model.dart';
 import 'package:fladder/providers/items/information_provider.dart';
-import 'package:fladder/util/clipboard_helper.dart';
+import 'package:fladder/screens/shared/fladder_snackbar.dart';
 import 'package:fladder/util/localization_helper.dart';
 import 'package:fladder/widgets/shared/clickable_text.dart';
 
@@ -78,7 +79,12 @@ class ItemInfoScreenState extends ConsumerState<ItemInfoScreen> {
                           const Spacer(),
                           const SizedBox(width: 6),
                           IconButton(
-                              onPressed: () => context.copyToClipboard(info.model.toString()),
+                              onPressed: () async {
+                                await Clipboard.setData(ClipboardData(text: info.model.toString()));
+                                if (context.mounted) {
+                                  fladderSnackbar(context, title: "Copied to clipboard");
+                                }
+                              },
                               icon: const Icon(Icons.copy_all_rounded)),
                           const SizedBox(width: 6),
                           IconButton(
@@ -165,7 +171,10 @@ class ItemInfoScreenState extends ConsumerState<ItemInfoScreen> {
         Flexible(
           child: ClickableText(
             text: title,
-            onTap: () => context.copyToClipboard(value),
+            onTap: () async {
+              await Clipboard.setData(ClipboardData(text: value));
+              fladderSnackbar(context, title: "Copied to clipboard");
+            },
             style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
@@ -202,7 +211,10 @@ class ItemInfoScreenState extends ConsumerState<ItemInfoScreen> {
                   ),
                 ),
                 IconButton(
-                    onPressed: () => context.copyToClipboard(InformationModel.mapToString(map)),
+                    onPressed: () async {
+                      await Clipboard.setData(ClipboardData(text: InformationModel.mapToString(map)));
+                      fladderSnackbar(context, title: "Copied to clipboard");
+                    },
                     icon: const Icon(Icons.copy_all_rounded))
               ],
             ),

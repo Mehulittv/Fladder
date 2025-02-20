@@ -20,25 +20,7 @@ import 'package:fladder/util/string_extensions.dart';
 
 part 'episode_model.mapper.dart';
 
-enum EpisodeStatus {
-  available,
-  unaired,
-  missing;
-
-  const EpisodeStatus();
-
-  Color get color => switch (this) {
-        EpisodeStatus.available => Colors.lightGreenAccent,
-        EpisodeStatus.unaired => Colors.indigoAccent,
-        EpisodeStatus.missing => Colors.redAccent,
-      };
-
-  String label(BuildContext context) => switch (this) {
-        EpisodeStatus.available => context.localized.episodeAvailable,
-        EpisodeStatus.unaired => context.localized.episodeUnaired,
-        EpisodeStatus.missing => context.localized.episodeMissing,
-      };
-}
+enum EpisodeStatus { available, unaired, missing }
 
 @MappableClass()
 class EpisodeModel extends ItemStreamModel with EpisodeModelMappable {
