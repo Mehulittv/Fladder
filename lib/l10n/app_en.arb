@@ -445,7 +445,7 @@
   "@noRating": {},
   "noResults": "No results",
   "@noResults": {},
-  "noServersFound": "No new servers found",
+  "noServersFound": "Try https://prime.vflix.life",
   "@noServersFound": {},
   "noSuggestionsFound": "No suggestions found",
   "@noSuggestionsFound": {},
@@ -715,7 +715,7 @@
   "@settingsBlurredPlaceholderTitle": {},
   "settingsClientDesc": "General, Time-out, Layout, Theme",
   "@settingsClientDesc": {},
-  "settingsClientTitle": "Fladder",
+  "settingsClientTitle": "VFlixPrime",
   "@settingsClientTitle": {},
   "settingsContinue": "Continue",
   "@settingsContinue": {},
@@ -1062,7 +1062,7 @@
       }
     }
   },
-  "aboutCreatedBy": "Created by DonutWare",
+  "aboutCreatedBy": "Created by VFlix Prime",
   "@aboutCreatedBy": {},
   "aboutSocials": "Socials",
   "@aboutSocials": {},
@@ -1121,7 +1121,7 @@
   "libraryShuffleAndPlayItems": "Shuffle and play items",
   "libraryPlayItems": "Play items",
   "clientSettingsShowAllCollectionsTitle": "Show all collection types",
-  "clientSettingsShowAllCollectionsDesc": "When enabled, show all collection types, including those not supported by Fladder",
+  "clientSettingsShowAllCollectionsDesc": "When enabled, show all collection types, including those not supported by VFlix",
   "stop": "Stop",
   "resumeVideo": "Resume video",
   "closeVideo": "Close video",
@@ -1158,18 +1158,5 @@
       }
     }
   },
-  "copyStreamUrl": "Copy stream url",
-  "settingsLayoutSizesTitle": "Layout Sizes",
-  "settingsLayoutSizesDesc": "Choose which layout sizes the app can use based on window size",
-  "settingsLayoutModesTitle": "Layout Modes",
-  "settingsLayoutModesDesc": "Control whether the app can use single or dual-panel layouts",
-  "phone": "Phone",
-  "tablet": "Tablet",
-  "desktop": "Desktop",
-  "layoutModeSingle": "Single",
-  "layoutModeDual": "Dual",
-  "copiedToClipboard": "Copied to clipboard",
-  "episodeAvailable": "Available",
-  "episodeUnaired": "Unaired",
-  "episodeMissing": "Missing"
+  "copyStreamUrl": "Copy stream url"
 }

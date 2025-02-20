@@ -11,11 +11,13 @@ import 'package:fladder/util/string_extensions.dart';
 import 'package:fladder/widgets/navigation_scaffold/components/adaptive_fab.dart';
 import 'package:fladder/widgets/navigation_scaffold/components/destination_model.dart';
 import 'package:fladder/widgets/navigation_scaffold/navigation_scaffold.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 enum HomeTabs {
   dashboard,
   favorites,
-  sync;
+  sync,
+  telegram;
 }
 
 @RoutePage()
@@ -25,54 +27,64 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final canDownload = ref.watch(showSyncButtonProviderProvider);
-    final destinations = HomeTabs.values
-        .map((e) {
-          switch (e) {
-            case HomeTabs.dashboard:
-              return DestinationModel(
-                label: context.localized.navigationDashboard,
-                icon: const Icon(IconsaxOutline.home),
-                selectedIcon: const Icon(IconsaxBold.home),
-                route: const DashboardRoute(),
-                action: () => context.router.navigate(const DashboardRoute()),
-                floatingActionButton: AdaptiveFab(
-                  context: context,
-                  title: context.localized.search,
-                  key: Key(e.name.capitalize()),
-                  onPressed: () => context.router.navigate(LibrarySearchRoute()),
-                  child: const Icon(IconsaxOutline.search_normal_1),
-                ),
-              );
-            case HomeTabs.favorites:
-              return DestinationModel(
-                label: context.localized.navigationFavorites,
-                icon: const Icon(IconsaxOutline.heart),
-                selectedIcon: const Icon(IconsaxBold.heart),
-                route: const FavouritesRoute(),
-                floatingActionButton: AdaptiveFab(
-                  context: context,
-                  title: context.localized.filter(0),
-                  key: Key(e.name.capitalize()),
-                  onPressed: () => context.router.navigate(LibrarySearchRoute(favourites: true)),
-                  child: const Icon(IconsaxOutline.heart_search),
-                ),
-                action: () => context.router.navigate(const FavouritesRoute()),
-              );
-            case HomeTabs.sync:
-              if (canDownload) {
-                return DestinationModel(
-                  label: context.localized.navigationSync,
-                  icon: const Icon(IconsaxOutline.cloud),
-                  selectedIcon: const Icon(IconsaxBold.cloud),
-                  route: SyncedRoute(),
-                  action: () => context.router.navigate(SyncedRoute()),
-                );
-              }
-              return null;
+    final destinations = HomeTabs.values.map((e) {
+      switch (e) {
+        case HomeTabs.dashboard:
+          return DestinationModel(
+            label: context.localized.navigationDashboard,
+            icon: const Icon(IconsaxOutline.home),
+            selectedIcon: const Icon(IconsaxBold.home),
+            route: const DashboardRoute(),
+            action: () => context.router.navigate(const DashboardRoute()),
+            floatingActionButton: AdaptiveFab(
+              context: context,
+              title: context.localized.search,
+              key: Key(e.name.capitalize()),
+              onPressed: () => context.router.navigate(LibrarySearchRoute()),
+              child: const Icon(IconsaxOutline.search_normal_1),
+            ),
+          );
+        case HomeTabs.favorites:
+          return DestinationModel(
+            label: context.localized.navigationFavorites,
+            icon: const Icon(IconsaxOutline.heart),
+            selectedIcon: const Icon(IconsaxBold.heart),
+            route: const FavouritesRoute(),
+            floatingActionButton: AdaptiveFab(
+              context: context,
+              title: context.localized.filter(0),
+              key: Key(e.name.capitalize()),
+              onPressed: () => context.router.navigate(LibrarySearchRoute(favourites: true)),
+              child: const Icon(IconsaxOutline.heart_search),
+            ),
+            action: () => context.router.navigate(const FavouritesRoute()),
+          );
+        case HomeTabs.sync:
+          if (canDownload) {
+            return DestinationModel(
+              label: context.localized.navigationSync,
+              icon: const Icon(IconsaxOutline.cloud),
+              selectedIcon: const Icon(IconsaxBold.cloud),
+              route: SyncedRoute(),
+              action: () => context.router.navigate(SyncedRoute()),
+            );
           }
-        })
-        .nonNulls
-        .toList();
+          return null;
+		  
+		case HomeTabs.telegram:
+          return DestinationModel(
+            label: "Telegram",
+            icon: const Icon(IconsaxOutline.send),
+            selectedIcon: const Icon(IconsaxBold.send),
+            action: () async {
+              const telegramGroupLink = "https://t.me/vflixprime2";
+              if (await canLaunch(telegramGroupLink)) {
+                await launch(telegramGroupLink);
+              }
+            },
+          );
+      }
+    });
     return HeroControllerScope(
       controller: HeroController(),
       child: AutoRouter(

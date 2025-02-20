@@ -12,6 +12,8 @@ class FladderLogo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final appName = ref.watch(applicationInfoProvider).name.capitalize();
+
     return Hero(
       tag: "Fladder_Logo_Tag",
       child: Wrap(
@@ -23,10 +25,11 @@ class FladderLogo extends ConsumerWidget {
         children: [
           const FladderIcon(),
           Text(
-            ref.read(applicationInfoProvider).name.capitalize(),
+            appName == "vflix prime" ? "VFlix Prime" : appName,
             style: context.textTheme.displayLarge,
             textAlign: TextAlign.center,
-          )
+            softWrap: true,
+          ),
         ],
       ),
     );

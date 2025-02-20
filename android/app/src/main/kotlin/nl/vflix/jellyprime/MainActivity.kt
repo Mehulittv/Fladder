@@ -1,4 +1,4 @@
-package nl.jknaapen.fladder
+package nl.vflix.jellyprime
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 import com.ryanheise.audioservice.AudioServiceFragmentActivity;
